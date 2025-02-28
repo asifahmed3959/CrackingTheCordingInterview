@@ -25,18 +25,18 @@ def array_to_binary_tree(arr, start, end):
     if len(arr) == 0:
         return None
 
-    if end > start:
-        return None
-
     if start > end:
         return None
 
     mid = (start + end) // 2
 
+    if mid >= len (arr):
+        return None
+    print(arr[mid])
     root = Node(arr[mid])
     print(arr)
-    root.left = array_to_binary_tree(root.left, start, mid-1)
-    root.right = array_to_binary_tree(root.right, mid+1, end)
+    root.left = array_to_binary_tree(arr, start, mid-1)
+    root.right = array_to_binary_tree(arr, mid+1, end)
     return root
 
 
@@ -45,3 +45,4 @@ if __name__ == "__main__":
     test_array = [1,2,3,4,5,6,7,8,9,10]
     # test_array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 43, 144, 515, 4123]
     root = array_to_binary_tree(test_array, 0, len(test_array))
+    print(root.__str__())
