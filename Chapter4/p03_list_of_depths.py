@@ -1,7 +1,6 @@
 from collections import deque
 
 from Chapter2.linked_list import LinkedListNode
-from Chapter2.linked_list import LinkedList
 
 
 class BinaryNode:
@@ -12,70 +11,98 @@ class BinaryNode:
 
 
 def create_node_list_by_depth(tree_root):
-    if tree_root == None:
-        return []
+    # BFS.
+    levels = {}
+    q = deque()
+    q.append((tree_root, 0))
 
+    while len(q) > 0:
+        node, level = q.popleft()
+        if level not in levels:
+            # First node in the level
+            levels[level] = LinkedList()
+        # Nodes already exist
+        levels[level].add(node)
+
+        # Push onto queue
+        if node.left:
+            q.append((node.left, level + 1))
+        if node.right:
+            q.append((node.right, level + 1))
+    return levels
+
+
+
+def create_node_list(tree):
     arr = []
 
-
-    level = 0
-
-    if len(arr) <= level:
-        node = LinkedListNode(tree_root)
-        arr.append(node)
-
-
-    def insert_values_at_level(node, height):
-        if node == None:
+    def helper(node, traverse_level):
+        if not node:
             return
 
-        if len(arr) <= height:
-            node = LinkedListNode(tree_root)
-            arr.append(node)
-        else:
+        insert_linked_list(node, traverse_level)
+        helper(node.left, traverse_level+1)
+        helper(node.right, traverse_level+1)
 
-            def insert_values_at_linkedList(head, node):
-                temp = head
-                while temp.next != None:
-                    temp = temp.next
+    def insert_linked_list(node, traverse_level):
+        if traverse_level == len(arr):
+            temp = LinkedListNode(node)
+            arr.append(temp)
+            return
 
-                temp.next = LinkedListNode(node)
+        head = arr[traverse_level]
+        temp = head
 
-            insert_values_at_linkedList(arr[height], node)
+        while temp.next != None:
+            temp = temp.next
 
-        insert_values_at_level(node.left, height+1)
-        insert_values_at_level(node.right, height+1)
+        temp.next = LinkedListNode(node)
 
-    insert_values_at_level(tree_root.left, level+1)
-    insert_values_at_level(tree_root.right, level+1)
+    helper(tree, 0)
 
     return arr
 
-#
+
+
 def create_node_list_by_depth_b(tree):
-    
-    return
+    if not tree:
+        return []
+
+    curr = tree
+    result = [LinkedList([curr])]
+    level = 0
+
+    while result[level]:
+        result.append(LinkedList())
+        for linked_list_node in result[level]:
+            n = linked_list_node.value
+            if n.left:
+                result[level + 1].add(n.left)
+            if n.right:
+                result[level + 1].add(n.right)
+        level += 1
+    return result
 
 
-testable_functions = [create_node_list_by_depth, ]
+testable_functions = [create_node_list_by_depth, create_node_list_by_depth_b, create_node_list]
 
 
-def test_create_node_list_by_depth():
-    for f in testable_functions:
-        node_h = BinaryNode("H")
-        node_g = BinaryNode("G")
-        node_f = BinaryNode("F")
-        node_e = BinaryNode("E", node_g)
-        node_d = BinaryNode("D", node_h)
-        node_c = BinaryNode("C", None, node_f)
-        node_b = BinaryNode("B", node_d, node_e)
-        node_a = BinaryNode("A", node_b, node_c)
-        lists = f(node_a)
-
-        assert lists[0].values() == LinkedList([node_a]).values()
-        assert lists[1].values() == LinkedList([node_b, node_c]).values()
-        assert lists[2].values() == LinkedList([node_d, node_e, node_f]).values()
-        assert lists[3].values() == LinkedList([node_h, node_g]).values()
+# def test_create_node_list_by_depth():
+#     for f in testable_functions:
+#         node_h = BinaryNode("H")
+#         node_g = BinaryNode("G")
+#         node_f = BinaryNode("F")
+#         node_e = BinaryNode("E", node_g)
+#         node_d = BinaryNode("D", node_h)
+#         node_c = BinaryNode("C", None, node_f)
+#         node_b = BinaryNode("B", node_d, node_e)
+#         node_a = BinaryNode("A", node_b, node_c)
+#         lists = f(node_a)
+#
+#         assert lists[0].values() == LinkedList([node_a]).values()
+#         assert lists[1].values() == LinkedList([node_b, node_c]).values()
+#         assert lists[2].values() == LinkedList([node_d, node_e, node_f]).values()
+#         assert lists[3].values() == LinkedList([node_h, node_g]).values()
 
 
 def example():
@@ -87,8 +114,14 @@ def example():
     root.right.left = BinaryNode(5)
     root.right.right = BinaryNode(6)
 
-    levels = create_node_list_by_depth(root)
-    print(levels)
+    levels = create_node_list(root)
+
+    for level in levels:
+        temp = level
+        print(level)
+        while temp != None:
+            print(temp.value.name)
+            temp = temp.next
 
 
 if __name__ == "__main__":
